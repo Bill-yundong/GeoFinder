@@ -62,6 +62,8 @@ export function generateMerchant(
   const prefix = Math.random() > 0.5 ? getRandomItem(merchantPrefixes) : '';
   const name = prefix + baseName;
 
+  const isActive = Math.random() > 0.3;
+  
   return {
     id: generateId(),
     name,
@@ -70,8 +72,8 @@ export function generateMerchant(
     lng: centerLng + lngOffset,
     rating: parseFloat((3.5 + Math.random() * 1.5).toFixed(1)),
     orderCount: Math.floor(getRandomInRange(10, 500)),
-    isActive: true,
-    activeOrders: Math.floor(getRandomInRange(1, 10))
+    isActive,
+    activeOrders: isActive ? Math.floor(getRandomInRange(1, 10)) : 0
   };
 }
 
@@ -214,7 +216,6 @@ export function generateNewOrder(
 
   if (!merchant) {
     const newMerchant = generateMerchant(centerLat, centerLng, maxRadiusKm);
-    newMerchant.isActive = true;
     return {
       merchant: newMerchant,
       order: generateOrder(newMerchant, 'pending')
@@ -421,6 +422,14 @@ export class OrderSimulator {
 
   getStats(): MerchantStats {
     return getMerchantStats(this.merchants);
+  }
+
+  getStatsInRadius(centerLat: number, centerLng: number, radiusKm: number): MerchantStats {
+    const merchantsInRadius = this.merchants.filter(merchant => {
+      const distance = calculateDistance(centerLat, centerLng, merchant.lat, merchant.lng);
+      return distance <= radiusKm;
+    });
+    return getMerchantStats(merchantsInRadius);
   }
 
   getMerchantsByDistance(centerLat: number, centerLng: number): (MerchantWithCategory & { distance: number })[] {

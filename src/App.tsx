@@ -82,7 +82,11 @@ function App() {
 
       orderSimulatorRef.current.setOnEvent((event: SimulationEvent) => {
         if (event.type === 'merchant_created' || event.type === 'order_created') {
-          const currentStats = orderSimulatorRef.current?.getStats();
+          const currentStats = orderSimulatorRef.current?.getStatsInRadius(
+            CENTER_LAT,
+            CENTER_LNG,
+            MAX_RADIUS
+          );
           if (currentStats) {
             setMerchantStats(currentStats);
           }
@@ -195,7 +199,11 @@ function App() {
         await dbManager.addMerchants(merchants);
         await dbManager.addOrders(orders);
 
-        const currentStats = orderSimulatorRef.current?.getStats();
+        const currentStats = orderSimulatorRef.current?.getStatsInRadius(
+          CENTER_LAT,
+          CENTER_LNG,
+          MAX_RADIUS
+        );
         if (currentStats) {
           setMerchantStats(currentStats);
         }
